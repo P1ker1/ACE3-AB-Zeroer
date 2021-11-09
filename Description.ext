@@ -1,0 +1,245 @@
+respawnDelay = 4;
+respawn = "BASE";
+RespawnDialog = 0;
+author = "P1ker1/A. Pike";
+OnLoadName = "P1ker's ACE Zeroer V1.0";
+onLoadMission = "Documentation TBA, maybe :)";
+allowFunctionsLog = 1;
+enableDebugConsole = 1;
+briefingName = "P1ker's ACE Zeroer V1.0";
+class Header
+{
+	gameType   = Coop;
+	minPlayers = 1;
+	maxPlayers = 8;
+};
+
+class Params
+{
+	class ace_advanced_ballistics_muzzleVelocityVariationEnabled
+	{
+		title = "Enable Muzzle Velocity Variation";
+		ACE_setting = 1;
+		values[] = {1,0};
+		texts[] = {"True", "False"};
+		default = 0;
+	};
+	class ace_advanced_ballistics_ammoTemperatureEnabled
+	{
+		title = "Enable Ammo Temperature Simulation";
+		ACE_setting = 1;
+		values[] = {1,0};
+		texts[] = {"True", "False"};
+		default = 1;
+	};
+	class ace_weather_enabled
+	{
+		title = "Enable Weather (=automated variation in Temperature, Barom. Press and Humidity )";
+		ACE_setting = 1;
+		values[] = {1,0};
+		texts[] = {"True", "False"};
+		default = 0;
+	};
+	class ace_weather_windSimulation
+	{
+		title = "Enable ACE Wind Simulation (If disabled, zeus can modify wind)";
+		ACE_setting = 1;
+		values[] = {1,0};
+		texts[] = {"True", "False"};
+		default = 1;
+	};
+	class ace_weather_updateInterval
+	{
+		title = "Weather update interval";
+		ACE_setting = 1;
+		values[] = {60,120,180,240,300,1,-1};
+		texts[] = {"1 minute (TFV server default)", "2 minutes","3 minutes","4 minutes","5 minutes (addon setting slider max)","Fukken Tornado", "-1 = infinite??"};
+		default = 240;
+	};
+};
+
+class CfgFunctions
+{
+	class PK
+	{
+		class funcs
+		{
+			file = "funcs";
+			class checkInput {};
+			class calculate_bullet_offset {};
+			class calculate_temp_n_alt {};
+			class displayBulletWindInfo {};
+			class export_mvt {};
+			class on_hit_TARGET2 {};
+			class playerWindInfo {};
+			class set_ace_weather {};
+			class setTargetPos {};
+			class setWindGUI {};
+			class show_wind_ratio {};
+		};
+	};
+};
+
+// Yeah, it's a bit ugly, but the man is doing A3 GUIs for the 1st time :D
+// And I figured I wouldn't port separate classes :)
+
+// Import the base GUI classes from A3
+import RscText;
+import RscButton;
+import RscEdit;
+
+class LaptopTitle
+{
+	idd = -1;
+	movingenable = false;
+	duration = 15;
+
+	class controls
+	{
+		// LABELS  \ text boxes
+		class LabelText: RscText
+		{
+			idc = 810;
+			font = "EtelkaNarrowMediumPro";
+			x = 0.3125;
+			y = 0.34;
+			w = 0.5;
+			h = 0.12;
+			SizeEx = 0.06;
+			text = "Input the following values in given units:";
+			colorBackground[] = {0,0,0,0.5};
+			shadow = 0;					//0 - none, 1 - color affected by background, 2 - black
+		};
+
+		class DistLabel: LabelText
+		{
+			text = "Distance:";
+			x = 0.2025;
+			h = 0.08;
+			y = 0.46;
+			w = 0.115;
+			sizeEx = 0.045
+			style = 32;
+		};
+
+		class WindLabel: DistLabel
+		{
+			text = "Wind:";
+			h = 0.08;
+			y = 0.54;
+		};
+
+		class AtmosphLabel: DistLabel
+		{
+			text = "°C % hPa:";
+			h = 0.08;
+			y = 0.62;
+		};
+
+		// Buttons
+		class OkButton: RscButton
+		{
+			idc = 820;
+			// All colors are included below
+			colorDisabled[] = {1,1,1,0.25};
+			colorBackground[] = {0,0,0,0.5};
+			colorBackgroundDisabled[] = {0,0,0,0.5};
+			colorBackgroundActive[] = {0,0,0,1};
+			colorBorder[] = {0,0,0,1};
+			colorFocused[] = {0,0,0,1};
+			colorShadow[] = {0,0,0,0};
+			colorText[] = {1,1,1,1};
+			shadow = 2;
+			offsetPressedX = 0.01;
+			offsetPressedY = 0.01;
+
+			sizeEx = 0.07;
+			text = "Ok";
+			x = 0.3125;
+			y = 0.72;
+			w = 0.5;
+			h = 0.08;
+			action = "closeDialog 0";	//action executed upon clicking the button (currently closes the dialog itself)
+		};
+
+		// Edit boxes
+		class DistanceEdit: RscEdit
+		{
+			idc = 830;
+			type = 2;
+			style = 0;
+			x = 0.3125;
+			y = 0.46;
+			w = 0.5;
+			h = 0.08;
+
+			canModify = true;
+			maxChars = 50;
+
+			font = "EtelkaNarrowMediumPro";
+			sizeEx = 0.04;
+			text = "600 (meters)";
+
+			colorText[] = {1,1,1,1};
+			colorBackground[] = {0,0,0,0.5};
+			color[] = {1,1,1,1};
+			colorActive[] = {0,1,0,1};
+			colorDisabled[] = {1,0,0,1};
+			colorSelection[] = {0,0,0,1};
+
+			onDestroy = "[(parseNumber (ctrlText 830))] call PK_fnc_setTargetPos; PREVIOUS_RANGE = (ctrlText 830); ";
+			onKillFocus = "[ctrlText 830] call PK_fnc_checkInput";
+			onLoad = "(_this#0) ctrlSetText PREVIOUS_RANGE";
+			// onChar = "systemChat str(parseNumber (ctrlText 830));";
+		};
+
+		class windSpeedEdit: DistanceEdit
+		{
+			idc = 840;
+			onDestroy = "PREVIOUS_WIND_SPEED = (ctrlText 840); "; // Actions are called in windDirectionEdit's onDestroy
+			onKillFocus = "[ctrlText 840] call PK_fnc_checkInput";
+			onLoad = "(_this#0) ctrlSetText PREVIOUS_WIND_SPEED";
+			text = "3 (m/s)";
+			y = 0.54;
+			w = 0.25;
+		};
+		class windDirectionEdit: windSpeedEdit
+		{
+			idc = 850;
+			onDestroy = " [(parseNumber (ctrlText 840)), (parseNumber (ctrlText 850))] call PK_fnc_setWindGUI; PREVIOUS_WIND_DIRECTION = (ctrlText 850); ";
+			onKillFocus = "[ctrlText 850] call PK_fnc_checkInput";
+			onLoad = "(_this#0) ctrlSetText PREVIOUS_WIND_DIRECTION";
+			text = "90 (degrees)";
+			x = 0.5625;
+		};
+		class tempEdit: windSpeedEdit
+		{
+			idc = 860;
+			onDestroy = " [(parseNumber (ctrlText 860)), (parseNumber (ctrlText 861)), (parseNumber (ctrlText 862))] call pk_fnc_set_ace_weather; PREVIOUS_TEMPERATURE_C = (ctrlText 860); ";
+			onKillFocus = "[ctrlText 860] call PK_fnc_checkInput";
+			onLoad = "(_this#0) ctrlSetText PREVIOUS_TEMPERATURE_C";
+			text = "20 °C";
+			x = 0.3125;
+			y = 0.62;
+			w = 0.16666666666;
+		};
+		class bpressEdit: tempEdit
+		{
+			idc = 861;
+			onDestroy = " PREVIOUS_BPRESS = (ctrlText 861); ";
+			onKillFocus = "[ctrlText 861] call PK_fnc_checkInput";
+			onLoad = "(_this#0) ctrlSetText PREVIOUS_BPRESS";
+			text = "950 hPa";
+			x = 0.64583333332;
+		};
+		class humidEdit: tempEdit
+		{
+			idc = 862;
+			onDestroy = " PREVIOUS_HUMIDITY = (ctrlText 862); ";
+			onKillFocus = "[ctrlText 862] call PK_fnc_checkInput";
+			onLoad = "(_this#0) ctrlSetText PREVIOUS_HUMIDITY";
+			text = "50 %";
+			x = 0.47916666666;
+		};
+	};
+};

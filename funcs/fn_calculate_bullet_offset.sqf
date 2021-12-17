@@ -2,7 +2,7 @@
  * Author: P1ker / Ari Hietanen
  * Calculates the offset between the impact of the bullet and the position aimed at when the weapon was fired
  * from the shooter's point of view.
- * The output is divided in vertical and horizontal components.
+ * The output is divided in vertical and horizontal components and is given in millradians (MRADs)
  *
  * Arguments (from Fired EH) https://community.bistudio.com/wiki/Arma_3:_Event_Handlers#Fired:
  * unit: Object - Object the event handler is assigned to
@@ -47,7 +47,9 @@ if (isNil "_target_pos") then {
 
 private _start_to_target = _target_pos vectorDiff _firing_pos;
 
-// The impact position is figured by the
+// The impact position is figured by stopping the loop as soon as the bullet
+// "dies." I tried other methods too that didn't require check but couldn't
+// It to work yet; this does the trick well enough!
 private _previous_speed = speed _projectile;
 private _min_ratio = (speed _projectile)/_previous_speed;
 /*
@@ -85,13 +87,14 @@ private _start_to_impact = _impact_pos vectorDiff _firing_pos;
 
 
 
-// Setting the horizontal component = Wind hold with dot product
+// Setting the horizontal component = Wind hold with dot product by comparing the
+// target which was aimed at and the point of impact where the bullet ultimately landed
 private _horiz_projection_coefficient = (_start_to_target vectorDotProduct _start_to_impact)/((vectorMagnitude _start_to_impact)^2);
 private _horiz_projection = _start_to_impact vectorMultiply _horiz_projection_coefficient;
 
 private _horiz_offset_in_meters = _horiz_projection distance2d _start_to_target;
 
-// lazily sets it either + or - depending on whether the bullet landed to left or right
+// Sets the offset either + or - depending on whether the bullet landed to left or right
 if (atan ((_horiz_projection select 0)/(_horiz_projection select 1))
 		< atan ((_start_to_target select 0)/(_start_to_target select 1)) ) then {
 	_horiz_offset_in_meters = -_horiz_offset_in_meters;
@@ -107,15 +110,16 @@ private _ffp_altitude = _firing_pos select 2;
 private _target_altitude = _target_pos select 2;
 private _impact_altitude = _impact_pos select 2;
 
-private _d_h_ffp_tgt = _target_altitude - _ffp_altitude;
-private _d_h_ffp_imp = _impact_altitude - _ffp_altitude;
+// _d = delta_
+private _d_height_ffp_tgt = _target_altitude - _ffp_altitude;
+private _d_height_ffp_imp = _impact_altitude - _ffp_altitude;
 
 // We have the opposite cathetus and hypotenuse
 // getting the difference from plane in mrads
-private _d_angle_ffp_tgt = 1000 * (rad asin(_d_h_ffp_tgt/(vectorMagnitude _start_to_target)));
-private _d_angle_ffp_imp = 1000 * (rad asin(_d_h_ffp_imp/(vectorMagnitude _start_to_impact)));
+private _d_angle_ffp_tgt = 1000 * (rad asin(_d_height_ffp_tgt/(vectorMagnitude _start_to_target)));
+private _d_angle_ffp_imp = 1000 * (rad asin(_d_height_ffp_imp/(vectorMagnitude _start_to_impact)));
 
-private _vert_offset_in_meters = _d_h_ffp_imp - _d_h_ffp_tgt;
+private _vert_offset_in_meters = _d_height_ffp_imp - _d_height_ffp_tgt;
 private _vert_offset_in_mrads = _d_angle_ffp_imp - _d_angle_ffp_tgt;
 
 
@@ -129,7 +133,7 @@ if (abs(_vert_offset_in_mrads) > 1) then {
 };
 
 
-// Global var for stuff :)
+// Update the global variable with offsets so far
 (MRAD_ADJUSTMENTS select 0) pushBack _horiz_offset_in_mrads;
 (MRAD_ADJUSTMENTS select 1) pushBack _vert_offset_in_mrads;
 
@@ -142,13 +146,13 @@ if (count (MRAD_ADJUSTMENTS select 0) > 0) then {
 
 
 // Get the current scope adjustments in MRADs
-
 _scope_adj_mrad = player getVariable ["ace_scopes_Adjustment", [[0, 0, 0], [0, 0, 0], [0, 0, 0]]] select 0;
 _scope_elev = _scope_adj_mrad select 0;
 _scope_wind = _scope_adj_mrad select 1;
 
-_elev_mrad = (ace_atragmx_elevationOutput select ace_atragmx_currentTarget)*1000*pi/(60*180);
-_wind_mrad = (ace_atragmx_windage1Output select ace_atragmx_currentTarget)*1000*pi/(60*180);
+// Store the current AtragMX profile values in MRADs
+_atrag_elev_mrad = (ace_atragmx_elevationOutput select ace_atragmx_currentTarget)*1000*pi/(60*180);
+_atrag_wind_mrad = (ace_atragmx_windage1Output select ace_atragmx_currentTarget)*1000*pi/(60*180);
 
 
 	/* Commenting the debug out for the hint

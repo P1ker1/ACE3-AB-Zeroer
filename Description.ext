@@ -76,7 +76,7 @@ class CfgFunctions
 			class setTargetPos {};
 			class setWindGUI {};
 			class show_wind_ratio {};
-			class normal_distribution {};
+			class gather_data_save_to_var {};
 		};
 	};
 };

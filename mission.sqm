@@ -12,7 +12,7 @@ class EditorData
 	};
 	class ItemIDProvider
 	{
-		nextID=70;
+		nextID=75;
 	};
 	class MarkerIDProvider
 	{
@@ -20,10 +20,10 @@ class EditorData
 	};
 	class Camera
 	{
-		pos[]={1012.9992,75.059044,1001.6174};
-		dir[]={0.00019563474,-0.99994999,0.009997867};
-		up[]={0.019562926,0.00999978,0.99975866};
-		aside[]={0.99980867,0,-0.019563904};
+		pos[]={1007.8894,31.952629,993.80237};
+		dir[]={-0.72760385,-0.47238225,0.49744108};
+		up[]={-0.38995868,0.88139379,0.26660314};
+		aside[]={0.56438005,0,0.82551503};
 	};
 };
 binarizationWanted=0;
@@ -35,16 +35,16 @@ addons[]=
 	"A3_Structures_F_Mil_BagFence",
 	"A3_Characters_F",
 	"ace_explosives",
-	"A3_Weapons_F_LongRangeRifles_M320",
-	"A3_Weapons_F_Mark_LongRangeRifles_M320",
+	"A3_Weapons_F_LongRangeRifles_GM6",
+	"A3_Weapons_F_Mark_LongRangeRifles_GM6",
 	"ace_realisticnames",
 	"ace_scopes",
 	"ace_ballistics",
 	"A3_Weapons_F_Acc",
 	"A3_Weapons_F",
-	"weapons_f_LRR_E",
 	"ace_vector",
 	"ace_parachute",
+	"acre_sys_components",
 	"ace_hearing",
 	"ace_microdagr",
 	"ace_maptools",
@@ -125,23 +125,24 @@ class AddonsMetaData
 		};
 		class Item8
 		{
-			className="weapons_f_LRR_E";
-			name="JointCom Armoury LRRE";
-			author="Grave";
-		};
-		class Item9
-		{
 			className="ace_vector";
 			name="ACE3 - Vector";
 			author="ACE-Team";
 			url="http://ace3mod.com/";
 		};
-		class Item10
+		class Item9
 		{
 			className="ace_parachute";
 			name="ACE3 - Parachute";
 			author="ACE-Team";
 			url="http://ace3mod.com/";
+		};
+		class Item10
+		{
+			className="acre_sys_components";
+			name="ACRE2 - Components";
+			author="ACRE2Team";
+			url="https://github.com/IDI-Systems/acre2";
 		};
 		class Item11
 		{
@@ -22663,19 +22664,19 @@ class Mission
 					flags=7;
 					class Attributes
 					{
-						init="call{this addEventHandler [""fired"", {_this spawn PK_fnc_calculate_bullet_offset}]; " \n "this addEventHandler [""Fired"",{(_this select 0) setVehicleAmmo 1}];" \n "this setCustomAimCoef 0;" \n "this setUnitrecoilCoefficient 0;" \n "this allowDamage false;" \n "this addAction [""SetPos"", {" \n "Projectile_Impact_Aux setPosATL (ASLtoATL (lineIntersectsSurfaces [(eyePos player), screentoWorld [0.5,0.5], objNull, objNull, true, 2,""VIEW"", ""FIRE"", true] select 1 select 0));" \n "}]}";
+						init="this addEventHandler [""fired"", {_this spawn PK_fnc_calculate_bullet_offset}]; " \n "this addEventHandler [""Fired"",{(_this select 0) setVehicleAmmo 1}];" \n "this setCustomAimCoef 0;" \n "this setUnitrecoilCoefficient 0;" \n "this allowDamage false;";
 						name="plr";
 						isPlayer=1;
 						class Inventory
 						{
 							class primaryWeapon
 							{
-								name="srifle_LRR_F";
-								optics="optic_lrps";
+								name="srifle_GM6_F";
+								optics="optic_LRPS";
 								class primaryMuzzleMag
 								{
-									name="7Rnd_408_Mag";
-									ammoLeft=7;
+									name="5Rnd_127x108_Mag";
+									ammoLeft=5;
 								};
 							};
 							class binocular
@@ -22735,16 +22736,6 @@ class Mission
 							{
 								typeName="V_Chestrig_rgr";
 								isBackpack=0;
-								class MagazineCargo
-								{
-									items=1;
-									class Item0
-									{
-										name="7Rnd_408_Mag";
-										count=10;
-										ammoLeft=7;
-									};
-								};
 							};
 							class backpack
 							{
@@ -22756,7 +22747,7 @@ class Mission
 									class Item0
 									{
 										name="ACE_7Rnd_408_305gr_Mag";
-										count=5;
+										count=4;
 										ammoLeft=7;
 									};
 								};
@@ -22778,6 +22769,7 @@ class Mission
 							map="ItemMap";
 							compass="ItemCompass";
 							watch="ACE_Altimeter";
+							radio="ItemRadioAcreFlagged";
 							gps="ItemGPS";
 							headgear="H_Cap_headphones";
 						};
@@ -22942,37 +22934,21 @@ class Mission
 			dataType="Object";
 			class PositionInfo
 			{
-				position[]={1000,26,995};
+				position[]={999.91101,30.577,1005.684};
 				angles[]={0,1.5707964,0};
 			};
 			side="Empty";
 			flags=1;
 			class Attributes
 			{
-			};
-			id=40;
-			type="Land_VR_Block_01_F";
-			atlOffset=17;
-		};
-		class Item7
-		{
-			dataType="Object";
-			class PositionInfo
-			{
-				position[]={999.91058,30.577,1005.6844};
-				angles[]={0,1.5707964,0};
-			};
-			side="Empty";
-			flags=1;
-			class Attributes
-			{
+				init="_this setObjectTextureGlobal [0,""#(rgb,8,8,3)color(0.1,0.1,0.1,1)""];";
 				name="BACKGROUND_BLOCK";
 			};
 			id=43;
 			type="Land_VR_Block_01_F";
 			atlOffset=21.577;
 		};
-		class Item8
+		class Item7
 		{
 			dataType="Marker";
 			position[]={1100,5,900};
@@ -22981,7 +22957,7 @@ class Mission
 			type="mil_dot";
 			id=44;
 		};
-		class Item9
+		class Item8
 		{
 			dataType="Marker";
 			position[]={1100,5,870};
@@ -22990,7 +22966,7 @@ class Mission
 			type="mil_dot";
 			id=45;
 		};
-		class Item10
+		class Item9
 		{
 			dataType="Object";
 			class PositionInfo
@@ -23029,7 +23005,7 @@ class Mission
 				nAttributes=1;
 			};
 		};
-		class Item11
+		class Item10
 		{
 			dataType="Object";
 			class PositionInfo
@@ -23046,7 +23022,7 @@ class Mission
 			type="Land_VR_Shape_01_cube_1m_F";
 			atlOffset=24;
 		};
-		class Item12
+		class Item11
 		{
 			dataType="Object";
 			class PositionInfo
@@ -23087,12 +23063,12 @@ class Mission
 				nAttributes=1;
 			};
 		};
-		class Item13
+		class Item12
 		{
 			dataType="Object";
 			class PositionInfo
 			{
-				position[]={1006,30.186705,998};
+				position[]={1006,30.186707,998};
 				angles[]={0,4.8454881,0};
 			};
 			side="Empty";
@@ -23193,7 +23169,7 @@ class Mission
 				nAttributes=2;
 			};
 		};
-		class Item14
+		class Item13
 		{
 			dataType="Group";
 			side="East";
@@ -23265,6 +23241,23 @@ class Mission
 			{
 			};
 			id=66;
+		};
+		class Item14
+		{
+			dataType="Object";
+			class PositionInfo
+			{
+				position[]={1000,26,995};
+				angles[]={0,1.5707964,0};
+			};
+			side="Empty";
+			flags=1;
+			class Attributes
+			{
+			};
+			id=40;
+			type="Land_VR_Block_01_F";
+			atlOffset=17;
 		};
 	};
 };

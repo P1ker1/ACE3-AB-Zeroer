@@ -76,6 +76,7 @@ class CfgFunctions
 			class setTargetPos {};
 			class setWindGUI {};
 			class show_wind_ratio {};
+			class normal_distribution {};
 		};
 	};
 };
@@ -178,7 +179,7 @@ class LaptopTitle
 
 			font = "EtelkaNarrowMediumPro";
 			sizeEx = 0.04;
-			text = "600 (meters)";
+			text = "1200 (meters)";
 
 			colorText[] = {1,1,1,1};
 			colorBackground[] = {0,0,0,0.5};
@@ -199,7 +200,7 @@ class LaptopTitle
 			onDestroy = "PREVIOUS_WIND_SPEED = (ctrlText 840); "; // Actions are called in windDirectionEdit's onDestroy
 			onKillFocus = "[ctrlText 840] call PK_fnc_checkInput";
 			onLoad = "(_this#0) ctrlSetText PREVIOUS_WIND_SPEED";
-			text = "3 (m/s)";
+			text = "0 (m/s)";
 			y = 0.54;
 			w = 0.25;
 		};
@@ -218,7 +219,7 @@ class LaptopTitle
 			onDestroy = " [(parseNumber (ctrlText 860)), (parseNumber (ctrlText 861)), (parseNumber (ctrlText 862))] call pk_fnc_set_ace_weather; PREVIOUS_TEMPERATURE_C = (ctrlText 860); ";
 			onKillFocus = "[ctrlText 860] call PK_fnc_checkInput";
 			onLoad = "(_this#0) ctrlSetText PREVIOUS_TEMPERATURE_C";
-			text = "20 °C";
+			text = "15 °C";
 			x = 0.3125;
 			y = 0.62;
 			w = 0.16666666666;
@@ -229,7 +230,7 @@ class LaptopTitle
 			onDestroy = " PREVIOUS_BPRESS = (ctrlText 861); ";
 			onKillFocus = "[ctrlText 861] call PK_fnc_checkInput";
 			onLoad = "(_this#0) ctrlSetText PREVIOUS_BPRESS";
-			text = "950 hPa";
+			text = "1010 hPa";
 			x = 0.64583333332;
 		};
 		class humidEdit: tempEdit

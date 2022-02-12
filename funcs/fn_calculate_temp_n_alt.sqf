@@ -4,11 +4,11 @@
 #define T_DELTA 0.0065			// The change in temperature per meter in altitude
 
 /*
- * REQUIRES ACE 
+ * REQUIRES ACE
  * Disable ACE Weather from Addon options to avoid conflicts!
  *
  * Author: P1ker / Ari Hietanen
- * 
+ *
  * Calculates the altitude and temperature where given temperature and barometric pressure are apparent.
  *
  * Based on ACE fncs
@@ -19,10 +19,10 @@
  * These two form a system of two equations which can be solved with known _input_bpress and _input_temp
  * Further notes on the steps towards the solution in "calc_temp_n_alt_readme.txt"
  *
- * _input_temp 	:<NUMBER>	The temperature (at _required_altitude)
+ * _input_temp 		:<NUMBER>	The temperature (at _required_altitude)
  * _input_bpress 	:<NUMBER>	The barometric pressure (at _required_altitude)
- * 
- * Return Value: <ARRAY>
+ *
+ * Return Value: 	<ARRAY>
  * 0: temperature at ground level <NUMBER>
  * 1: altitude Above Terrain Level (ATL) <NUMBER>
  *
@@ -36,9 +36,9 @@ private ["_o", "_a_0", "_required_altitude", "_required_temperature"];
 _o = ace_weather_currentOvercast;
 
 // This calculates it so that player must be elevated a certain amount to reach the value
-_a_0 = (getPosASL player select 2) - (getPosATL player select 2); 
+_a_0 = (getPosASL player select 2) - (getPosATL player select 2);
 
-// Based on the functions linked at rows 20 & 22:
+// Based on the functions linked at rows 15 & 17:
 _required_altitude = -(((_input_bpress/(BPRESS_0-10*_o))^(1/COEF)-1)*_input_temp+(C_IN_KELVINS+a_0*T_DELTA)*(_input_bpress/(BPRESS_0-10*_o))^(1/COEF)-C_IN_KELVINS)/(T_DELTA*(_input_bpress/(BPRESS_0-10*_o))^(1/COEF));
 _required_temperature = _input_temp+T_DELTA*_required_altitude;
 

@@ -1,4 +1,6 @@
 /*
+ * REQUIRES ACE
+ *
  * Author: P1ker / Ari Hietanen
  * Calculates the offset between the impact of the bullet and the position aimed at when the weapon was fired
  * from the shooter's point of view.

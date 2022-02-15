@@ -46,6 +46,9 @@ _keyDown = (findDisplay 46) displayAddEventHandler ["KeyDown", "if (_this select
 	MRAD_ADJUSTMENTS = [[],[],[]];
 }"];
 
+// For FN_gather_data_save_to_var
+GATHERED_WIND_DATA = [];
+
 // Requires A3LOG https://github.com/Arkensor/A3LOG/releases/tag/1.8
 LOG_WITH_A3LOG = false;
 SNIPER_LOG_FILE = "impact_log";

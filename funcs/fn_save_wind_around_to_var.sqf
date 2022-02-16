@@ -38,7 +38,7 @@ for "_TWS" from _TWS_min to _TWS_max step _TWS_change_step do {
 	systemChat format ["Wind speed updated: %1", _TWS];
 	setWind [0, _TWS, true];  // blows from 180
 
-	for "_dir" from _start_dir to _start_dir+_end_dir step _dir_step do {
+	for "_dir" from _start_dir to _end_dir step _dir_step do {
 
 		player setDir _dir;
 		systemChat format ["Dir updated: %1", _dir];

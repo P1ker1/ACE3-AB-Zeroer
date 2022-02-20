@@ -130,18 +130,20 @@ dmypy.json
 
 
 
-# Texts and xlsxs
+# Texts, tables (AtragMX profile), databases
 *.txt
 *.xlsx
 *.db
 
 # Except the example Atrag profile
-!*atragmxprofile_example.txt
+!*edited_atragmxprofile.txt
+!*original_atragmxprofile.txt
 
-# Local files excluded
-histogram_a3.py
+# Local debug & test file folder excluded
+*debug/
 
-
-
-# Arma 3 mission files that include map objects etc.
-*.sqm
+# Image files etc. saved in plots folder
+*.jpg
+*.jpeg
+*.png
+*.xcf

@@ -76,7 +76,8 @@ class CfgFunctions
 			class setTargetPos {};
 			class setWindGUI {};
 			class show_wind_ratio {};
-			class gather_data_save_to_var {};
+			class save_wind_around_to_var {};
+			class fire_player_gun_n_times {};
 		};
 	};
 };

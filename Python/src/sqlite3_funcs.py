@@ -74,8 +74,8 @@ def insert_into_DB(sqf_path, table_name, firing_dist, weapon, weapon_short, ammo
             )
             """)
 
-        # Test print
-        print(f'{os.path.basename(db_path)} has currently {len(curs.execute(f"SELECT * FROM {TABLE_NAME}").fetchall())} rows')
+        # Log print
+        print(f'Table "{table_name}" in "{os.path.basename(db_path)}" has currently {len(curs.execute(f"SELECT * FROM {TABLE_NAME}").fetchall())} rows')
 
         conn.commit()
 

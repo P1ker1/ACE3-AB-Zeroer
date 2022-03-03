@@ -4,8 +4,7 @@ import pandas as pd
 import os.path
 from data_processing_funcs import sqf_to_pylist
 
-BASE_DIR = os.path.abspath("")
-DB_PATH = os.path.join(BASE_DIR, "fired_shots_reinitialized.db")
+DB_PATH = "fired_shots_reinitialized.db"
 TABLE_NAME = "shots"
 
 
@@ -162,7 +161,7 @@ def delete_from_table(condition, table_name, db_path):
         curs.execute(q)
 
 
-def standardize_column(column_name, data_batch, table_name, db_path):
+def standardize_column(column_name, condition, table_name, db_path):
     """
     Sets the mean of a column to 0.
     I.e.,
@@ -178,9 +177,41 @@ def standardize_column(column_name, data_batch, table_name, db_path):
         SET {column_name} = {column_name} - (
             SELECT AVG({column_name})
             FROM {table_name}
-            WHERE data_batch={data_batch}
+            WHERE {condition}
         )
-        WHERE data_batch={data_batch}
+        WHERE {condition}
         """
 
         curs.execute(q)
+
+
+def update_dist_to_mean(table_name, db_path, df_weap):
+    """
+    Updates the distance to mean for each row in table_name which is included
+    in df_weap. This happens by creating a temporary table to db_path using
+    a pandas df as the basis & then updating the original table based on the
+    temp one.
+    """
+    with sqlite3.connect(db_path) as conn:
+        curs = conn.cursor()
+
+        # Update the distances after the removal of the cluster
+        df_weap["dist_from_mean"] = df_weap.apply(lambda df: np.sqrt(df["x"]**2+df["y"]**2), axis=1)
+        # Apply is a more efficient way to execute the operation on each member
+        # & doesn't require looping over the df
+
+        curs.execute(f"DROP TABLE IF EXISTS temp_shots")
+
+        # Create a new table to the database & add the updated df to it
+        df_weap.to_sql(name="temp_shots", con=conn, index=False)
+
+        # Update, UPDATE FROM is supported by SQLite
+        curs.execute(f"""
+        UPDATE {table_name}
+        SET dist_from_mean = temp_shots.dist_from_mean
+        FROM temp_shots
+        WHERE {table_name}.id = temp_shots.id
+        """)
+
+        # Get rid of the temp_shots table, as it's redundant now
+        curs.execute(f"DROP TABLE IF EXISTS temp_shots")

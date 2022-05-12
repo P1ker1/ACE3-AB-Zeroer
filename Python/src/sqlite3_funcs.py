@@ -106,10 +106,10 @@ def add_null_column(colname, val_type, db_path, table_name):
         curs.execute(q)
 
 
-def update_selection_to_one(condition:str, col_to_be_altered, val, db_path=DB_PATH, table_name=TABLE_NAME):
+def update_selection_to_one(where_clause:str, col_to_be_altered, val, db_path=DB_PATH, table_name=TABLE_NAME):
     """
     Updates each value of a selection to a predefined value using
-    SQLite's WHERE as the condition
+    SQLite's where_clause
     """
 
     with sqlite3.connect(db_path) as conn:
@@ -118,7 +118,7 @@ def update_selection_to_one(condition:str, col_to_be_altered, val, db_path=DB_PA
         q = f"""
         UPDATE {table_name}
         SET {col_to_be_altered} = {val}
-        WHERE {condition}
+        {where_clause}
         """
 
         curs.execute(q)
@@ -145,9 +145,9 @@ def initialize_db_n_table(drop_if_exists: bool, table_name:str, database_path: s
     pass  # <- to not return the comment on ipynb
 
 
-def delete_from_table(condition, table_name, db_path):
+def delete_from_table(where_clause, table_name, db_path):
     """
-    Deletes every row of table_name which fills the given condition
+    Deletes every row of table_name which fills the given where_clause
     """
 
     with sqlite3.connect(db_path) as conn:
@@ -155,13 +155,13 @@ def delete_from_table(condition, table_name, db_path):
 
         q = f"""
         DELETE FROM {table_name}
-        WHERE {condition}
+        {where_clause}
         """
 
         curs.execute(q)
 
 
-def standardize_column(column_name, condition, table_name, db_path):
+def standardize_column(column_name, where_clause, table_name, db_path):
     """
     Sets the mean of a column to 0.
     I.e.,
@@ -177,9 +177,9 @@ def standardize_column(column_name, condition, table_name, db_path):
         SET {column_name} = {column_name} - (
             SELECT AVG({column_name})
             FROM {table_name}
-            WHERE {condition}
+            {where_clause}
         )
-        WHERE {condition}
+        {where_clause}
         """
 
         curs.execute(q)
@@ -192,11 +192,17 @@ def update_dist_to_mean(table_name, db_path, df_weap):
     a pandas df as the basis & then updating the original table based on the
     temp one.
     """
+
+    # in this one, using "where_clause" parameter isn't as clear, and
+    # "table_name is just as explicit"
+
     with sqlite3.connect(db_path) as conn:
         curs = conn.cursor()
 
         # Update the distances after the removal of the cluster
         df_weap["dist_from_mean"] = df_weap.apply(lambda df: np.sqrt(df["x"]**2+df["y"]**2), axis=1)
+        df_weap["x"] -= np.mean(df_weap["x"])
+        df_weap["y"] -= np.mean(df_weap["y"])
         # Apply is a more efficient way to execute the operation on each member
         # & doesn't require looping over the df
 

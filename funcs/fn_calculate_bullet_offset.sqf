@@ -188,7 +188,9 @@ private _scope_wind = _scope_adj_mrad select 1;
 
 private _x_bar = _adjustment_data#0;
 private _y_bar = _adjustment_data#1;
-private _impact_dist_from_mean = 1000 * (([_x_bar, _y_bar] distance2D [_horiz_offset_in_mrads, _vert_offset_in_mrads])/(_dist_to_impact));
+// Old ↓
+// private _impact_dist_from_mean = 1000 * (([_x_bar, _y_bar] distance2D [_horiz_offset_in_mrads, _vert_offset_in_mrads])/(_dist_to_impact));
+private _impact_dist_from_mean = ([_x_bar, _y_bar] distance2D [_horiz_offset_in_mrads, _vert_offset_in_mrads]);
 
 // Updates the averages each time a new value gets added
 
@@ -199,7 +201,8 @@ if ((abs(_vert_offset_in_mrads) <= 1) and count (MRAD_ADJUSTMENTS select 0) > 1)
 	// systemChat format ["Len of array: %1", MRAD_ADJUSTMENTS select 2];
 	for "_i" from 0 to (count (MRAD_ADJUSTMENTS select 0)-1) step 1 do {
 		(MRAD_ADJUSTMENTS select 2) set [_i,
-			1000 * (([_x_bar, _y_bar] distance2D [((MRAD_ADJUSTMENTS select 0) select _i), ((MRAD_ADJUSTMENTS select 1) select _i)])/(_dist_to_impact))
+			// OLD1000 * (([_x_bar, _y_bar] distance2D [((MRAD_ADJUSTMENTS select 0) select _i), ((MRAD_ADJUSTMENTS select 1) select _i)])/(_dist_to_impact))
+			([_x_bar, _y_bar] distance2D [((MRAD_ADJUSTMENTS select 0) select _i), ((MRAD_ADJUSTMENTS select 1) select _i)])
 		];
 		// DEBUG below
 		// systemChat format ["_i: %1", _i];
@@ -265,6 +268,11 @@ systemChat ("Impact dist from mean: " + str (_impact_dist_from_mean));
 	lineBreak,
 	lineBreak,
 	*/
+/*
+private _x_bar = _adjustment_data#0;
+private _y_bar = _adjustment_data#1;
+private _impact_dist_from_mean = 1000 * (([_x_bar, _y_bar] distance2D [_horiz_offset_in_mrads, _vert_offset_in_mrads])/(_dist_to_impact));
+*/
 
 hintSilent composeText
 [
@@ -283,6 +291,11 @@ hintSilent composeText
 	format ["The horizontal offset in mrads: %1", _horiz_offset_in_mrads],
 	lineBreak,
 	format ["The vertical offset in mrads: %1", _vert_offset_in_mrads],
+	lineBreak,
+	lineBreak,
+	format ["_x_bar: %1", _x_bar],
+	lineBreak,
+	format ["_y_bar: %1", _y_bar],
 	lineBreak,
 	lineBreak,
 	format ["Bullect vel / Transonic vel: %1/%2", _previous_speed, _transonic_speed],

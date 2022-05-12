@@ -147,3 +147,7 @@ dmypy.json
 *.jpeg
 *.png
 *.xcf
+
+
+*.exe
+*.ggb
